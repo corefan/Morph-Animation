@@ -7,6 +7,7 @@ using System.Collections.Generic;
 [CustomEditor(typeof(MorphAnimation))]
 public class MorphAnimationEditor : Editor
 {
+    #region Field
     private MorphAnimation _morphAnimation;
     private Transform _transform;
     private SkinnedMeshRenderer _skinnedMeshRenderer;
@@ -26,6 +27,7 @@ public class MorphAnimationEditor : Editor
     private bool _showMorphSetting;
     private bool _showRenderSetting;
     private bool _showMaterials;
+    #endregion
 
     private void OnEnable()
     {

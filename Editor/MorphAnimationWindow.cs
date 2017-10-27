@@ -3,6 +3,7 @@ using UnityEditor;
 
 public class MorphAnimationWindow : EditorWindow 
 {
+    #region Field
     private MorphAnimation _morphAnimation;
     private MorphAnimationFrame _currentFrame;
     private Transform _currentBone;
@@ -21,6 +22,7 @@ public class MorphAnimationWindow : EditorWindow
     private Vector2 _scorll2;
     private GUIContent _previewButton;
     private GUIContent _addFrameButton;
+    #endregion
 
     public void Init(MorphAnimation ma)
     {
@@ -335,8 +337,8 @@ public class MorphAnimationWindow : EditorWindow
     {
         for (int i = 0; i < _morphAnimation.Bones.Count; i++)
         {
-            _morphAnimation.Bones[i].position = maf.Positions[i];
-            _morphAnimation.Bones[i].rotation = maf.Rotations[i];
+            _morphAnimation.Bones[i].localPosition = maf.Positions[i];
+            _morphAnimation.Bones[i].localRotation = maf.Rotations[i];
             _morphAnimation.Bones[i].localScale = maf.Scales[i];
         }
     }
@@ -348,8 +350,8 @@ public class MorphAnimationWindow : EditorWindow
 
         for (int i = 0; i < _morphAnimation.Bones.Count; i++)
         {
-            maf.Positions.Add(_morphAnimation.Bones[i].position);
-            maf.Rotations.Add(_morphAnimation.Bones[i].rotation);
+            maf.Positions.Add(_morphAnimation.Bones[i].localPosition);
+            maf.Rotations.Add(_morphAnimation.Bones[i].localRotation);
             maf.Scales.Add(_morphAnimation.Bones[i].localScale);
         }
     }
@@ -384,9 +386,9 @@ public class MorphAnimationWindow : EditorWindow
             for (int i = 0; i < _morphAnimation.Bones.Count; i++)
             {
                 if (_morphAnimation.IsPosition)
-                    _morphAnimation.Bones[i].position = Vector3.Lerp(maf.Positions[i], lastmaf.Positions[i], location);
+                    _morphAnimation.Bones[i].localPosition = Vector3.Lerp(maf.Positions[i], lastmaf.Positions[i], location);
                 if (_morphAnimation.IsRotation)
-                    _morphAnimation.Bones[i].rotation = Quaternion.Lerp(maf.Rotations[i], lastmaf.Rotations[i], location);
+                    _morphAnimation.Bones[i].localRotation = Quaternion.Lerp(maf.Rotations[i], lastmaf.Rotations[i], location);
                 if (_morphAnimation.IsScale)
                     _morphAnimation.Bones[i].localScale = Vector3.Lerp(maf.Scales[i], lastmaf.Scales[i], location);
             }

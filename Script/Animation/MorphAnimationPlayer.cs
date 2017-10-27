@@ -69,9 +69,9 @@ public class MorphAnimationPlayer : MonoBehaviour
             for (int i = 0; i < _bones.Length; i++)
             {
                 if (Clip.IsPosition)
-                    _bones[i].position = Vector3.Lerp(currentMaf.Positions[i], lastMaf.Positions[i], location);
+                    _bones[i].localPosition = Vector3.Lerp(currentMaf.Positions[i], lastMaf.Positions[i], location);
                 if (Clip.IsRotation)
-                    _bones[i].rotation = Quaternion.Lerp(currentMaf.Rotations[i], lastMaf.Rotations[i], location);
+                    _bones[i].localRotation = Quaternion.Lerp(currentMaf.Rotations[i], lastMaf.Rotations[i], location);
                 if (Clip.IsScale)
                     _bones[i].localScale = Vector3.Lerp(currentMaf.Scales[i], lastMaf.Scales[i], location);
             }
@@ -88,9 +88,9 @@ public class MorphAnimationPlayer : MonoBehaviour
             for (int i = 0; i < _bones.Length; i++)
             {
                 if (Clip.IsPosition)
-                    _bones[i].position = Clip.AnimationFrames[index].Positions[i];
+                    _bones[i].localPosition = Clip.AnimationFrames[index].Positions[i];
                 if (Clip.IsRotation)
-                    _bones[i].rotation = Clip.AnimationFrames[index].Rotations[i];
+                    _bones[i].localRotation = Clip.AnimationFrames[index].Rotations[i];
                 if (Clip.IsScale)
                     _bones[i].localScale = Clip.AnimationFrames[index].Scales[i];
             }

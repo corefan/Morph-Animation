@@ -4,6 +4,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class MorphAnimation : MonoBehaviour 
 {
+    #region Field
     [HideInInspector] public bool IsApprove = false;
     [HideInInspector] public bool IsDone = false;
     public List<MorphTriangle> Triangles;
@@ -15,4 +16,5 @@ public class MorphAnimation : MonoBehaviour
     public List<Transform> Bones;
     public List<MorphAnimationFrame> AnimationFrames;
     public List<MorphAnimationFrame> TimeLine;
+    #endregion
 }
