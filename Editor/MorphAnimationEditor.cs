@@ -32,6 +32,8 @@ public class MorphAnimationEditor : Editor
     private void OnEnable()
     {
         _morphAnimation = target as MorphAnimation;
+        _transform = _morphAnimation.transform;
+        _boneSize = 0.1f;
         ReSet();
 
         if (!_morphAnimation.IsApprove)
@@ -39,8 +41,7 @@ public class MorphAnimationEditor : Editor
 
         if (_morphAnimation.IsDone)
             return;
-
-        _transform = _morphAnimation.transform;
+        
         _skinnedMeshRenderer = _transform.GetComponent<SkinnedMeshRenderer>();
         _mesh = _skinnedMeshRenderer.sharedMesh;
         _meshCollider = _transform.GetComponent<MeshCollider>();
@@ -51,7 +52,6 @@ public class MorphAnimationEditor : Editor
         _MATool = MATool.Move;
         _vertexHandleType = HandleType.Wire;
         _vertexIconSize = 0.01f;
-        _boneSize = 0.1f;
         _reNameBone = false;
         _newNameBone = "";
 
@@ -64,10 +64,7 @@ public class MorphAnimationEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        if (Application.isPlaying)
-            return;
-
-        if (!_morphAnimation.IsApprove)
+        if (Application.isPlaying || !_morphAnimation.IsApprove)
             return;
 
         if (_morphAnimation.IsDone)
@@ -282,14 +279,15 @@ public class MorphAnimationEditor : Editor
 
     private void OnSceneGUI()
     {
-        if (Application.isPlaying)
+        if (Application.isPlaying || !_morphAnimation.IsApprove)
             return;
 
-        if (!_morphAnimation.IsApprove)
-            return;
+        MorphHandles.DrawMorphBone(_transform, _boneSize);
 
         if (_morphAnimation.IsDone)
+        {
             return;
+        }
 
         ChangeHandleTool();
         EditBone();
@@ -302,8 +300,6 @@ public class MorphAnimationEditor : Editor
     {
         if (_MAEditType == MAEditType.Bone)
         {
-            MorphHandles.DrawMorphBone(_transform, _boneSize);
-
             if (_currentCheckedBone != null)
             {
                 SetHandlesColor(Color.white);
@@ -791,6 +787,15 @@ public class MorphAnimationEditor : Editor
 
         _morphAnimation.IsDone = true;
         _morphAnimation.Bones = _skinnedMeshRenderer.bones.ToList();
+        _morphAnimation.BindPosesPosition = new List<Vector3>();
+        _morphAnimation.BindPosesRotation = new List<Quaternion>();
+        _morphAnimation.BindPosesScale = new List<Vector3>();
+        for (int i = 0; i < _morphAnimation.Bones.Count; i++)
+        {
+            _morphAnimation.BindPosesPosition.Add(_morphAnimation.Bones[i].localPosition);
+            _morphAnimation.BindPosesRotation.Add(_morphAnimation.Bones[i].localRotation);
+            _morphAnimation.BindPosesScale.Add(_morphAnimation.Bones[i].localScale);
+        }
         _morphAnimation.AnimationFrames = new List<MorphAnimationFrame>();
         _morphAnimation.TimeLine = new List<MorphAnimationFrame>();
 
@@ -798,7 +803,9 @@ public class MorphAnimationEditor : Editor
         _morphAnimation.Vertexs = null;
         for (int i = 0; i < _morphAnimation.Bones.Count; i++)
         {
-            DestroyImmediate(_morphAnimation.Bones[i].GetComponent<MorphBone>());
+            MorphBone mb = _morphAnimation.Bones[i].GetComponent<MorphBone>();
+            if (mb)
+                DestroyImmediate(mb);
         }
 
         MorphAnimationWindow maw = EditorWindow.GetWindow<MorphAnimationWindow>();

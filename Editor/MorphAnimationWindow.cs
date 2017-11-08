@@ -22,6 +22,8 @@ public class MorphAnimationWindow : EditorWindow
     private Vector2 _scorll2;
     private GUIContent _previewButton;
     private GUIContent _addFrameButton;
+    private float _height;
+    private float _space;
     #endregion
 
     public void Init(MorphAnimation ma)
@@ -41,7 +43,9 @@ public class MorphAnimationWindow : EditorWindow
         _isRename = false;
         _newName = "";
         _previewButton = new GUIContent("", "Preview Animation");
-        _addFrameButton = new GUIContent("", "Add Frame In TimeLine");
+        _addFrameButton = new GUIContent("", "Add Frame To TimeLine");
+        _height = 100;
+        _space = 2;
 
         EditorApplication.update += Update;
     }
@@ -122,7 +126,7 @@ public class MorphAnimationWindow : EditorWindow
         SetGUIEnabled(!_isPreview);
         if (GUILayout.Button("Add Key Frame", "Toolbarbutton"))
         {
-            MorphAnimationFrame maf = new MorphAnimationFrame("New Key Frame", new Vector2(position.width / 2, position.height / 2));
+            MorphAnimationFrame maf = new MorphAnimationFrame("NewKeyFrame" + _morphAnimation.AnimationFrames.Count, new Vector2(position.width / 2, position.height / 2));
             GetFrameData(maf);
             _morphAnimation.AnimationFrames.Add(maf);
         }
@@ -244,16 +248,16 @@ public class MorphAnimationWindow : EditorWindow
     {
         if (_currentFrame != null)
         {
-            float h = 30 + _morphAnimation.Bones.Count * 20;
-            if (h < 110) h = 110;
+            float h = 5;
+            GUI.BeginGroup(new Rect(5, 50, 220, _height), new GUIStyle("flow node 0"));
+            GUI.Label(new Rect(5, h, 100, 16), "Bone List:", "BoldLabel");
+            h = h + _space + 16;
 
-            GUI.BeginGroup(new Rect(0, 60, 210, h), new GUIStyle("HelpBox"));
-            GUI.Label(new Rect(0, 0, 100, 20), "Bone List:", "PreLabel");
             for (int i = 0; i < _morphAnimation.Bones.Count; i++)
             {
-                Rect rect = new Rect(0, 20 + i * 20, 100, 20);
+                Rect rect = new Rect(5, h, 100, 16);
                 SetGUIColor(Color.white, _currentBone == _morphAnimation.Bones[i] ? Color.red : Color.white);
-                if (GUI.Button(rect, _morphAnimation.Bones[i].name))
+                if (GUI.Button(rect, _morphAnimation.Bones[i].name, "minibutton"))
                 {
                     _currentBone = _morphAnimation.Bones[i];
                     _currentBoneParent = null;
@@ -266,20 +270,32 @@ public class MorphAnimationWindow : EditorWindow
                         _boneDistance = Vector3.Distance(_currentBone.position, _currentBoneParent.position);
                     }
                 }
+                h = h + _space + 16;
             }
+
+            _height = h;
+            if (_height < 116)
+            {
+                _height = 116;
+            }
+
             SetGUIColor(Color.white, Color.white);
-            GUI.Label(new Rect(100, 0, 100, 20), "Frame Name:", "PreLabel");
-            GUI.Label(new Rect(100, 20, 100, 20), _currentFrame.name);
-            GUI.Label(new Rect(100, 40, 100, 20), "Frame Time:", "PreLabel");
+            GUI.Label(new Rect(115, 5, 100, 16), "Frame Name:", "BoldLabel");
+            GUI.Label(new Rect(115, 23, 100, 16), _currentFrame.name);
+            GUI.Label(new Rect(115, 41, 100, 16), "Frame Time:", "BoldLabel");
             string oldv = _currentFrame.Time.ToString();
-            string newv = GUI.TextField(new Rect(100, 60, 100, 20), oldv);
+            string newv = GUI.TextField(new Rect(115, 59, 100, 16), oldv);
             if (oldv != newv)
             {
                 _currentFrame.Time = float.Parse(newv);
             }
-            if (GUI.Button(new Rect(100, 80, 100, 20), "Apply Bone"))
+            if (GUI.Button(new Rect(115, 77, 100, 16), "Apply Bone", "minibutton"))
             {
                 GetFrameData(_currentFrame);
+            }
+            if (GUI.Button(new Rect(115, 95, 100, 16), "ReSet Pose", "minibutton"))
+            {
+                ReSetPose();
             }
             GUI.EndGroup();
         }
@@ -353,6 +369,15 @@ public class MorphAnimationWindow : EditorWindow
             maf.Positions.Add(_morphAnimation.Bones[i].localPosition);
             maf.Rotations.Add(_morphAnimation.Bones[i].localRotation);
             maf.Scales.Add(_morphAnimation.Bones[i].localScale);
+        }
+    }
+    private void ReSetPose()
+    {
+        for (int i = 0; i < _morphAnimation.Bones.Count; i++)
+        {
+            _morphAnimation.Bones[i].localPosition = _morphAnimation.BindPosesPosition[i];
+            _morphAnimation.Bones[i].localRotation = _morphAnimation.BindPosesRotation[i];
+            _morphAnimation.Bones[i].localScale = _morphAnimation.BindPosesScale[i];
         }
     }
     private void PreviewAnimation()
